@@ -14,9 +14,9 @@ class NeuroGame {
         this.sequence = [];
         this.playerSequence = [];
         this.level = 1;
-        this.gridSize = 4; // Start with 4x4 for iconic high-IQ feel
-        this.baseSpeed = 600; // Faster base speed for high-IQ challenge
-        this.batchSize = 10; // Start with 10 numbers
+        this.gridSize = 3; // Reset to 3x3 for an easier start
+        this.baseSpeed = 700;
+        this.batchSize = 6; // Start with 6 numbers as requested
         this.bestScore = localStorage.getItem('neuro_best') || 0;
         this.isMultiplayer = false;
         this.currentPlayer = 1;
@@ -86,23 +86,25 @@ class NeuroGame {
         this.playerSequence = [];
         this.levelVal.textContent = this.level;
 
-        // Update Difficulty: Increase grid size at level 5
-        if (this.level > 5) {
+        // Smoother Grid Expansion
+        if (this.level > 10) {
             this.gridSize = 5;
+            this.initGrid();
+        } else if (this.level > 4) {
+            this.gridSize = 4;
             this.initGrid();
         }
 
-        this.updateMessage(`MEMORIZE ${this.batchSize} NUMBERS`, "var(--accent-glow)");
+        this.updateMessage(`LEVEL ${this.level}: MEMORIZE ${this.batchSize}`, "var(--accent-glow)");
 
-        // Generate a completely NEW batch of numbers based on current batch size
         this.sequence = [];
         const totalCells = this.gridSize * this.gridSize;
         for (let i = 0; i < this.batchSize; i++) {
             this.sequence.push(Math.floor(Math.random() * totalCells));
         }
 
-        // Dynamic speed based on batch size (faster as batch grows)
-        this.currentSpeed = Math.max(150, 500 - (this.batchSize * 2));
+        // Speed scales with batch size
+        this.currentSpeed = Math.max(180, 600 - (this.batchSize * 15));
 
         await this.showSequence();
 
@@ -178,7 +180,7 @@ class NeuroGame {
                     this.currentPlayer = this.currentPlayer === 1 ? 2 : 1;
                 }
                 this.level++;
-                this.batchSize += 10; // Increase difficulty by 10 each level
+                this.batchSize += 1; // Increment by 1 each level (6, 7, 8, 9...)
                 await this.nextRound();
             }, 1000);
         }
@@ -208,8 +210,8 @@ class NeuroGame {
             this.multiBtn.style.display = 'block';
             this.startBtn.textContent = "RE-INITIALIZE";
             this.level = 1;
-            this.gridSize = 4;
-            this.batchSize = 10;
+            this.gridSize = 3;
+            this.batchSize = 6;
             this.initGrid();
             this.levelVal.textContent = "1";
         }, 500);
